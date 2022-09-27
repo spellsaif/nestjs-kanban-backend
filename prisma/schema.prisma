@@ -6,6 +6,48 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  password String
+  Board    Board[]
+
+  @@map("users")
+}
+
+model Board {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  isFavourite Boolean   @default(false)
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      Int
+  Section     Section[]
+
+  @@map("boards")
+}
+
+model Section {
+  id      Int    @id @default(autoincrement())
+  title   String
+  board   Board? @relation(fields: [boardId], references: [id])
+  boardId Int
+  Task    Task[]
+
+  @@map("sections")
+}
+
+model Task {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  section     Section @relation(fields: [sectionId], references: [id])
+  sectionId   Int
+
+  @@map("tasks")
 }
